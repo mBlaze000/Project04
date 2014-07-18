@@ -15,3 +15,9 @@ Route::get('/', function()
 {
 	return View::make('hello');
 });
+
+// Display test info
+Route::get('/test', function()
+{
+	echo "TEST COMPLETE!";
+});
