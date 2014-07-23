@@ -21,3 +21,18 @@ Route::get('/test', function()
 {
 	echo "TEST COMPLETE!";
 });
+
+// Find out what environment we're in.
+Route::get('/get-environment',function() {
+
+    echo "Environment: ".App::environment();
+
+});
+
+// Trigger an error to check whether detailed error or generic error is displayed.
+Route::get('/trigger-error',function() {
+
+    # Class Foobar should not exist, so this should create an error
+    $foo = new Foobar;
+
+});

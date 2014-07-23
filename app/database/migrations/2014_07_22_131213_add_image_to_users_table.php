@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUsers extends Migration {
+class AddImageToUsersTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,14 +12,8 @@ class CreateUsers extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('users', function(Blueprint $table)
-		{
-			//
-			$table->increments('id');
-			$table->string('name', 128);
-			$table->string('email');
-			$table->string('password', 60);
-			$table->timestamps();
+		Schema::table('users',function($table) {
+			$table->binary('photo');
 		});
 	}
 
@@ -30,7 +24,9 @@ class CreateUsers extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('users');
+		Schema::table('books', function($table) {
+			$table->dropColumn('photo');
+		});
 	}
 
 }
