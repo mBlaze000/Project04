@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddImageToUsersTable extends Migration {
+class AddRememberToken extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -13,7 +13,7 @@ class AddImageToUsersTable extends Migration {
 	public function up()
 	{
 		Schema::table('users',function($table) {
-			$table->binary('photo');
+			$table->boolean('remember_token');
 		});
 	}
 
@@ -25,7 +25,7 @@ class AddImageToUsersTable extends Migration {
 	public function down()
 	{
 		Schema::table('users', function($table) {
-			$table->dropColumn('photo');
+			$table->dropColumn('remember_token');
 		});
 	}
 

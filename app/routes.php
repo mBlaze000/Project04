@@ -11,16 +11,203 @@
 |
 */
 
+/*-------------------------------------------------------------------------
+Home page
+-------------------------------------------------------------------------*/
 Route::get('/', function()
 {
-	return View::make('hello');
+	return View::make('index');
 });
 
-// Display test info
-Route::get('/test', function()
-{
-	echo "TEST COMPLETE!";
+
+
+/*-------------------------------------------------------------------------
+// !get signup user
+-------------------------------------------------------------------------*/
+Route::get('/signup',
+    array(
+        'before' => 'guest',
+        function() {
+            return View::make('signup');
+        }
+    )
+);
+
+/*-------------------------------------------------------------------------
+// !post signup user
+-------------------------------------------------------------------------*/
+Route::post('/signup', array('before' => 'csrf', function() {
+
+	$user = new User;
+	$user->email = Input::get('email');
+	$user->name = Input::get('name');
+	$user->password = Hash::make(Input::get('password'));
+
+	try {
+		$user->save();
+	}
+	catch (Exception $e) {
+		return Redirect::to('/signup')
+			->with('flash_message', 'Sign up failed; please try again.')
+			->withInput();
+	}
+
+	# Log in
+	Auth::login($user);
+
+	return Redirect::to('/list')->with('flash_message', 'Welcome to Task Manager!');
+
+}));
+
+
+
+/*-------------------------------------------------------------------------
+// !get login user
+-------------------------------------------------------------------------*/
+Route::get('/login',
+    array(
+        'before' => 'guest',
+        function() {
+            return View::make('login');
+        }
+    )
+);
+
+/*-------------------------------------------------------------------------
+// !post login user
+-------------------------------------------------------------------------*/
+Route::post('/login', array('before' => 'csrf', function() {
+
+	$credentials = Input::only('email', 'password');
+
+	if (Auth::attempt($credentials, $remember = true)) {
+		return Redirect::intended('list')->with('flash_message', 'Welcome Back!');
+	}
+	else {
+		return Redirect::to('/login')->with('flash_message', 'Log in failed; please try again.');
+	}
+
+	return Redirect::to('login');
+
+}));
+
+
+/*-------------------------------------------------------------------------
+// !get logout user
+-------------------------------------------------------------------------*/
+Route::get('/logout', function() {
+
+	# Log out
+	Auth::logout();
+
+	# Send them to the login page
+	return Redirect::to('login');
+
 });
+
+
+/*-------------------------------------------------------------------------------------------------
+// !get list tasks
+-------------------------------------------------------------------------------------------------*/
+Route::get('/list/{status?}', array('before' => 'auth', function($status = 'all') {
+	
+	$userid = Auth::user()->id;
+	
+	if($status == 'completed') {
+		$tasks = Task::where('complete', '>', '0')
+				->where('user_id', '=', $userid)
+				->get();
+	}
+	elseif($status == 'open') {
+		$tasks = Task::where('complete', '=', '0')
+				->where('user_id', '=', $userid)
+				->get();
+	}
+	else {
+		$tasks = Task::where('user_id', '=', $userid)
+				->get();
+	}
+	return View::make('list')
+		->with('tasks', $tasks)
+		->with('status', strtolower($status));
+}));
+
+
+
+
+/*-------------------------------------------------------------------------------------------------
+// !get add tasks
+-------------------------------------------------------------------------------------------------*/
+Route::get('/add', array('before' => 'auth', function() {
+	return View::make('add');
+}));
+
+/*-------------------------------------------------------------------------------------------------
+// !post add tasks
+-------------------------------------------------------------------------------------------------*/
+Route::post('/add', array('before' => 'csrf', function() {
+	
+	$user = Auth::user();
+	
+	$task = new Task();
+				
+	$task->name = Input::get('name');
+	$task->user()->associate($user);
+
+	$task->save();
+
+	return Redirect::to('/list')->with('flash_message', 'Task added successfully');
+
+
+}));
+
+
+
+/*-------------------------------------------------------------------------------------------------
+// !get edit tasks
+-------------------------------------------------------------------------------------------------*/
+Route::get('/edit/{item}/{status}', array('before' => 'auth', function($item, $status) {
+	
+	$task = Task::find($item);
+	
+	return View::make('edit')
+		->with('task', $task)
+		->with('status', $status);
+	
+}));
+
+/*-------------------------------------------------------------------------------------------------
+// !post edit tasks NEEDS WORK
+-------------------------------------------------------------------------------------------------*/
+Route::post('/edit/{item}/{status}', array('before' => 'csrf', function($item, $status) {
+
+	$task = Task::find($item);
+
+	$task->name = Input::get('name');
+	$task->complete = Input::get('complete');
+
+	$task->save();
+	
+	if($task->complete > 0) {
+		$task->completed_at = $task->updated_at;
+	}
+	else {
+		$task->completed_at = NULL;
+	}
+
+	$task->save();
+	
+
+	return Redirect::to('/list/'.$status)->with('flash_message', 'Task updated successfully');
+
+}));
+
+
+
+
+/*-------------------------------------------------------------------------
+// debugging routes
+-------------------------------------------------------------------------*/
 
 // Find out what environment we're in.
 Route::get('/get-environment',function() {

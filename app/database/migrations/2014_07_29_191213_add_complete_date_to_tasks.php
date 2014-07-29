@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddImageToUsersTable extends Migration {
+class AddCompleteDateToTasks extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,8 +12,8 @@ class AddImageToUsersTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::table('users',function($table) {
-			$table->binary('photo');
+		Schema::table('tasks',function($table) {
+			$table->timestamp('completed_at')->nullable();
 		});
 	}
 
@@ -25,7 +25,7 @@ class AddImageToUsersTable extends Migration {
 	public function down()
 	{
 		Schema::table('users', function($table) {
-			$table->dropColumn('photo');
+			$table->dropColumn('completed_at');
 		});
 	}
 
