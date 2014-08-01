@@ -100,3 +100,12 @@ body {
 .toppadding {
 	padding-top: 50px;	
 }
+.error {
+	font-weight: bold;
+	color: #F00;
+}
+.icon {
+	width: 25px;
+}.date {
+	width: 150px;
+}

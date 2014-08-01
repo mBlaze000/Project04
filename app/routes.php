@@ -37,6 +37,21 @@ Route::get('/signup',
 // !post signup user
 -------------------------------------------------------------------------*/
 Route::post('/signup', array('before' => 'csrf', function() {
+	
+	$rules = array(
+		'email' => 'required|email|unique:users,email',
+		'name' => 'required',
+		'password' => 'required|min:6'
+	);
+	
+	$validator = Validator::make(Input::all(), $rules);
+	
+	if($validator->fails()) {
+		return Redirect::to('/signup')
+			->with('flash_message', 'Sign up failed; please fix the errors listed below.')
+			->withInput()
+			->withErrors($validator);
+	}
 
 	$user = new User;
 	$user->email = Input::get('email');
@@ -166,9 +181,16 @@ Route::post('/add', array('before' => 'csrf', function() {
 /*-------------------------------------------------------------------------------------------------
 // !get edit tasks
 -------------------------------------------------------------------------------------------------*/
-Route::get('/edit/{item}/{status}', array('before' => 'auth', function($item, $status) {
+Route::get('/edit/{item?}/{status?}', array('before' => 'auth', function($item=1, $status='all') {
 	
-	$task = Task::find($item);
+	try {
+		$task = Task::findOrFail($item);
+	}
+	catch(Exception $e) {
+		return Redirect::to('/list')->with('flash_message', 'Task not found');
+	}
+	
+	$task = Task::findOrFail($item);
 	
 	return View::make('edit')
 		->with('task', $task)

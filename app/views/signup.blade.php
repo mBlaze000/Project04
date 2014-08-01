@@ -9,7 +9,8 @@
 @stop
 
 @section('body')
-    
+    <p>Please enter your information in the following fields.</p>
+    <p>All fields are required.</p>
     <p>
         {{ Form::open(array('url' => '/signup')) }}
         
@@ -19,13 +20,20 @@
             First Name<br>
             {{ Form::text('name') }}<br><br>
         
-            Password:<br>
+            Password (at least 6 characters):<br>
             {{ Form::password('password') }}<br><br>
         
         
             {{ Form::submit('Sign Up') }}
         
         {{ Form::close() }}
+    </p>
+    <p>
+    
+        @foreach($errors->all() as $message) 
+            <div class='error'>{{ $message }}</div>
+        @endforeach
+           
     </p>
 
 @stop
