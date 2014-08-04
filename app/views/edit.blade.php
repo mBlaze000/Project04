@@ -23,19 +23,23 @@
 @stop
 
 @section('body')
-    <p>
+    <p class="formspace">
         {{ Form::open(array('url' => '/edit/'.$task['id'].'/'.$status )) }}
         
-            Task Name<br>
-            {{ Form::text('name', $task['name']) }}<br><br>
+        
+            {{ Form::label('name', 'Task Name:', array('class' => 'editlabel')) }}
+            {{ Form::text('name', $task['name'], array('class' => 'textinput', 'id' => 'name', 'onblur' => 'funcSetHidden('.$userid.')')) }}<br><br> 
+            {{ Form::label('complete', 'Complete?', array('class' => 'editlabel')) }}
+            {{ Form::checkbox('complete', 1, $task['complete'], array('onclick' => 'funcToggleDate()')) }}<br><br>
             
-            Completed?<br>
-                @if ($task['complete'] == '0')
-                    {{ Form::checkbox('complete', '1') }}<br><br>
-                @else
-                    {{ Form::checkbox('complete', 1, true) }}<br><br>
-                @endif
-
+            <div id="datecomplete">
+            {{ Form::label('completed_at', 'Date Complete:', array('class' => 'editlabel')) }}
+            {{ Form::text('completed_at', $complete_date, array('class' => 'textinput')) }}<br>
+            (Enter date as mm/dd/yyyy)<br><br>
+			</div>
+            
+            <!--
+            -->
         
         
             {{ Form::submit('Update task') }}
@@ -43,6 +47,19 @@
         {{ Form::close() }}
     </p>
     
+    <p id="testOutput">
+        @foreach($errors->all() as $message) 
+            <div class='error'>{{ $message }}</div>
+        @endforeach
+    </p>
 
 @stop
 
+@section('footer')
+    <script type="text/javascript" src="{{ URL::asset('scripts/edit.js') }}"></script>
+    <script type="text/javascript" src="{{ URL::asset('scripts/add.js') }}"></script>
+    
+	<!--
+    -->
+@stop	
+    

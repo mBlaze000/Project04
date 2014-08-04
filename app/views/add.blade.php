@@ -9,17 +9,29 @@
 @stop
 
 @section('body')
-    <p>
+    <p class="formspace">
         {{ Form::open(array('url' => '/add')) }}
         
-            Task Name<br>
-            {{ Form::text('name') }}<br><br>
-        
+            {{ Form::label('name', 'Task Name:', array('class' => 'editlabel')) }}
+            {{ Form::text('name', '', array('class' => 'textinput', 'id' => 'name', 'onblur' => 'funcSetHidden('.$userid.')')) }}<br><br> 
+            
+            {{ Form::hidden('task_name','', array('id' => 'task_name')) }}
         
             {{ Form::submit('Add task') }}
         
         {{ Form::close() }}
     </p>
-
+    
+    <p id="testOutput">
+        @foreach($errors->all() as $message) 
+            <div class='error'>{{ $message }}</div>
+        @endforeach
+    </p>
+           
 @stop
 
+@section('footer')
+	<!--
+    -->
+    <script type="text/javascript" src="{{ URL::asset('scripts/add.js') }}"></script>
+@stop	

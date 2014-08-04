@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddCompleteDateToTasks extends Migration {
+class AddTaskNameToTasks extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -13,7 +13,7 @@ class AddCompleteDateToTasks extends Migration {
 	public function up()
 	{
 		Schema::table('tasks',function($table) {
-			$table->timestamp('completed_at')->nullable();
+			$table->string('task_name');
 		});
 	}
 
@@ -25,7 +25,7 @@ class AddCompleteDateToTasks extends Migration {
 	public function down()
 	{
 		Schema::table('tasks', function($table) {
-			$table->dropColumn('completed_at');
+			$table->dropColumn('task_name');
 		});
 	}
 

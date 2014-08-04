@@ -109,3 +109,21 @@ body {
 }.date {
 	width: 150px;
 }
+.formspace {
+	padding-top: 20px;	
+}
+.loginlabel {
+	width: 75px;
+}
+.editlabel {
+	width: 120px;
+}
+.signuplabel {
+	width: 80px;
+}
+.textinput {
+	width: 200px;
+}
+#datecomplete {
+	
+}

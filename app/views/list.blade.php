@@ -88,8 +88,8 @@
                                 </td>
                             @endif
                             <td>{{ $task['name'] }}</td>
-                            <td> <!-- <a href="/delete/{{ $task['id'] }}/{{ $status }}"><img src="/images/delete.png" alt="Delete task" title="Delete task" /></a> --></td>
-                            
+                            <td> <a href="#" onclick="funcDeleteTask( '/delete/{{ $task['id'] }}/{{ $status }}' )"><img src="/images/delete.png" alt="Delete task" title="Delete task" /></a> </td>
+                            <!-- -->
                         </tr>
                     @endforeach
                     
@@ -102,3 +102,8 @@
 
 @stop
 
+@section('footer')
+	<!--
+    -->
+    <script type="text/javascript" src="{{ URL::asset('scripts/delete.js') }}"></script>
+@stop	

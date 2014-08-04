@@ -11,17 +11,18 @@
 @section('body')
     <p>Please enter your information in the following fields.</p>
     <p>All fields are required.</p>
-    <p>
+    <p class="formspace">
         {{ Form::open(array('url' => '/signup')) }}
         
-            Email<br>
-            {{ Form::text('email') }}<br><br>
+            {{ Form::label('email', 'Email:', array('class' => 'signuplabel')) }}
+            {{ Form::text('email', '', array('class' => 'textinput')) }}<br><br>
         
-            First Name<br>
-            {{ Form::text('name') }}<br><br>
+            {{ Form::label('name', 'First Name:', array('class' => 'signuplabel')) }}
+            {{ Form::text('name', '', array('class' => 'textinput')) }}<br><br>
         
-            Password (at least 6 characters):<br>
-            {{ Form::password('password') }}<br><br>
+            {{ Form::label('password', 'Password:', array('class' => 'signuplabel')) }}
+            {{ Form::password('password', array('class' => 'textinput')) }}<br>
+            (Password must be at least 6 characters)<br><br>
         
         
             {{ Form::submit('Sign Up') }}

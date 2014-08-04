@@ -154,7 +154,10 @@ Route::get('/list/{status?}', array('before' => 'auth', function($status = 'all'
 // !get add tasks
 -------------------------------------------------------------------------------------------------*/
 Route::get('/add', array('before' => 'auth', function() {
-	return View::make('add');
+	
+	$userid = Auth::user()->id;
+	
+	return View::make('add')->with('userid', $userid);
 }));
 
 /*-------------------------------------------------------------------------------------------------
@@ -162,14 +165,36 @@ Route::get('/add', array('before' => 'auth', function() {
 -------------------------------------------------------------------------------------------------*/
 Route::post('/add', array('before' => 'csrf', function() {
 	
+	$rules = array(
+		'name' => 'required',
+		'task_name' => 'unique:tasks,task_name'
+	);
+	
+	$validator = Validator::make(Input::all(), $rules);
+	
+	if($validator->fails()) {
+		return Redirect::to('/add')
+			->with('flash_message', 'Task entry failed; please fix the errors listed below.')
+			->withInput()
+			->withErrors($validator);
+	}
+
 	$user = Auth::user();
 	
 	$task = new Task();
 				
 	$task->name = Input::get('name');
+	$task->task_name = Input::get('task_name');
 	$task->user()->associate($user);
 
-	$task->save();
+	try {
+		$task->save();
+	}
+	catch (Exception $e) {
+		return Redirect::to('/add')
+			->with('flash_message', 'Sign up failed; please try again.')
+			->withInput();
+	}
 
 	return Redirect::to('/list')->with('flash_message', 'Task added successfully');
 
@@ -181,7 +206,7 @@ Route::post('/add', array('before' => 'csrf', function() {
 /*-------------------------------------------------------------------------------------------------
 // !get edit tasks
 -------------------------------------------------------------------------------------------------*/
-Route::get('/edit/{item?}/{status?}', array('before' => 'auth', function($item=1, $status='all') {
+Route::get('/edit/{item?}/{status?}', array('before' => 'auth', function($item=0, $status='all') {
 	
 	try {
 		$task = Task::findOrFail($item);
@@ -190,28 +215,55 @@ Route::get('/edit/{item?}/{status?}', array('before' => 'auth', function($item=1
 		return Redirect::to('/list')->with('flash_message', 'Task not found');
 	}
 	
-	$task = Task::findOrFail($item);
+	$userid = Auth::user()->id;
+	
+	if($task->completed_at != NULL) {
+		$complete_date = strtotime($task->completed_at);
+		$complete_date = date('m/d/Y',$complete_date);
+	}
+	else {
+		$complete_date = date('m/d/Y');
+	}
 	
 	return View::make('edit')
 		->with('task', $task)
-		->with('status', $status);
+		->with('status', $status)
+		->with('userid', $userid)
+		->with('complete_date', $complete_date);
 	
 }));
 
 /*-------------------------------------------------------------------------------------------------
-// !post edit tasks NEEDS WORK
+// !post edit tasks
 -------------------------------------------------------------------------------------------------*/
 Route::post('/edit/{item}/{status}', array('before' => 'csrf', function($item, $status) {
+
+	$rules = array(
+		'name' => 'required',
+		'completed_at'=>'required|date|date_format:m/d/Y'
+	);
+	
+	$validator = Validator::make(Input::all(), $rules);
+	
+	if($validator->fails()) {
+		return Redirect::to('/edit/'.$item.'/'.$status)
+			->with('flash_message', 'Task edit failed; please fix the errors listed below.')
+			->withInput()
+			->withErrors($validator);
+	}
 
 	$task = Task::find($item);
 
 	$task->name = Input::get('name');
 	$task->complete = Input::get('complete');
 
-	$task->save();
+	// 2014-07-31 20:42:34
 	
 	if($task->complete > 0) {
-		$task->completed_at = $task->updated_at;
+		$complete_date = strtotime(Input::get('completed_at'));
+		$complete_date = date('Y-m-d h:i:s', $complete_date);
+		
+		$task->completed_at = $complete_date;
 	}
 	else {
 		$task->completed_at = NULL;
@@ -226,6 +278,24 @@ Route::post('/edit/{item}/{status}', array('before' => 'csrf', function($item, $
 
 
 
+
+/*-------------------------------------------------------------------------------------------------
+// !get delete tasks
+-------------------------------------------------------------------------------------------------*/
+Route::get('/delete/{item?}/{status?}', array('before' => 'auth', function($item=0, $status='all') {
+	
+	try {
+		$task = Task::findOrFail($item);
+	}
+	catch(Exception $e) {
+		return Redirect::to('/list')->with('flash_message', 'Task not found');
+	}
+	
+	$task->delete();
+	
+	return Redirect::to('/list/'.$status)
+		->with('flash_message', 'Task deleted successfully');
+}));
 
 /*-------------------------------------------------------------------------
 // debugging routes
