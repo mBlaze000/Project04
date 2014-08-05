@@ -4,15 +4,13 @@
 	active
 @stop
 
-@section('title')
-	Sign up for Task Manager
-@stop
+@section('title')Sign up for Task Manager @stop
 
 @section('body')
     <p>Please enter your information in the following fields.</p>
     <p>All fields are required.</p>
-    <p class="formspace">
-        {{ Form::open(array('url' => '/signup')) }}
+    
+        {{ Form::open(array('url' => '/signup', 'class' => 'formspace' )) }}
         
             {{ Form::label('email', 'Email:', array('class' => 'signuplabel')) }}
             {{ Form::text('email', '', array('class' => 'textinput')) }}<br><br>
@@ -24,17 +22,14 @@
             {{ Form::password('password', array('class' => 'textinput')) }}<br>
             (Password must be at least 6 characters)<br><br>
         
-        
             {{ Form::submit('Sign Up') }}
         
         {{ Form::close() }}
-    </p>
+        
     <p>
-    
         @foreach($errors->all() as $message) 
             <div class='error'>{{ $message }}</div>
         @endforeach
-           
     </p>
 
 @stop

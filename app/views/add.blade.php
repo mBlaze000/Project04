@@ -1,16 +1,11 @@
 @extends('_master')
 
-@section('all')
-	active
-@stop
+@section('all')active @stop
 
-@section('title')
-	Add Your Task Here
-@stop
+@section('title')Add Your Task Here @stop
 
 @section('body')
-    <p class="formspace">
-        {{ Form::open(array('url' => '/add')) }}
+        {{ Form::open(array('url' => '/add', 'class' => 'formspace' )) }}
         
             {{ Form::label('name', 'Task Name:', array('class' => 'editlabel')) }}
             {{ Form::text('name', '', array('class' => 'textinput', 'id' => 'name', 'onblur' => 'funcSetHidden('.$userid.')')) }}<br><br> 
@@ -20,7 +15,6 @@
             {{ Form::submit('Add task') }}
         
         {{ Form::close() }}
-    </p>
     
     <p id="testOutput">
         @foreach($errors->all() as $message) 

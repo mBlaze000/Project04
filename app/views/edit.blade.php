@@ -18,17 +18,18 @@
     @endif
 @stop
 
-@section('title')
-	{{ Auth::user()->name; }}, Edit Your Task
-@stop
+@section('title'){{ Auth::user()->name; }}, Edit Your Task @stop
 
 @section('body')
-    <p class="formspace">
-        {{ Form::open(array('url' => '/edit/'.$task['id'].'/'.$status )) }}
+        {{ Form::open(array('url' => '/edit/'.$task['id'].'/'.$status, 'class' => 'formspace' )) }}
         
         
             {{ Form::label('name', 'Task Name:', array('class' => 'editlabel')) }}
-            {{ Form::text('name', $task['name'], array('class' => 'textinput', 'id' => 'name', 'onblur' => 'funcSetHidden('.$userid.')')) }}<br><br> 
+            {{ Form::text('name', $task['name'], array('class' => 'textinput', 'id' => 'name', 'onblur' => 'funcSetTask('.$userid.')')) }}<br><br> 
+            
+            {{ Form::hidden('orig_name','', array('id' => 'orig_name', 'onload' => 'funcSetOrig('.$userid.')')) }}
+            {{ Form::hidden('task_name','', array('id' => 'task_name')) }}
+        
             {{ Form::label('complete', 'Complete?', array('class' => 'editlabel')) }}
             {{ Form::checkbox('complete', 1, $task['complete'], array('onclick' => 'funcToggleDate()')) }}<br><br>
             
@@ -40,12 +41,9 @@
             
             <!--
             -->
-        
-        
             {{ Form::submit('Update task') }}
         
         {{ Form::close() }}
-    </p>
     
     <p id="testOutput">
         @foreach($errors->all() as $message) 
@@ -57,8 +55,9 @@
 
 @section('footer')
     <script type="text/javascript" src="{{ URL::asset('scripts/edit.js') }}"></script>
-    <script type="text/javascript" src="{{ URL::asset('scripts/add.js') }}"></script>
-    
+    <script>
+		funcSetOrig({{ $userid }});
+	</script>
 	<!--
     -->
 @stop	

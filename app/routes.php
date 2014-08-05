@@ -240,6 +240,7 @@ Route::post('/edit/{item}/{status}', array('before' => 'csrf', function($item, $
 
 	$rules = array(
 		'name' => 'required',
+		'task_name' => 'unique:tasks,task_name',
 		'completed_at'=>'required|date|date_format:m/d/Y'
 	);
 	
@@ -256,6 +257,10 @@ Route::post('/edit/{item}/{status}', array('before' => 'csrf', function($item, $
 
 	$task->name = Input::get('name');
 	$task->complete = Input::get('complete');
+	
+	if(Input::get('task_name') != '') {
+		$task->task_name = Input::get('task_name');
+	}
 
 	// 2014-07-31 20:42:34
 	
