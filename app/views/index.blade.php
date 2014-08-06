@@ -1,12 +1,6 @@
 @extends('_master')
 
-@section('home')
-	active
-@stop
-
-@section('title')
-	Welcome to Task Manager
-@stop
+@section('title')Welcome to Task Manager @stop
 
 @section('body')
     <p class="toppadding">

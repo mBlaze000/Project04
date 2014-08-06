@@ -1,9 +1,5 @@
 @extends('_master')
 
-@section('login')
-	active
-@stop
-
 @section('title')Login to Task Manager @stop
 
 @section('body')

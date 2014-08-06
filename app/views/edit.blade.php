@@ -1,23 +1,5 @@
 @extends('_master')
 
-@section('all')
-	@if ($status == 'all')
-    	active
-    @endif
-@stop
-
-@section('complete')
-	@if ($status == 'completed')
-    	active
-    @endif
-@stop
-
-@section('open')
-	@if ($status == 'open')
-    	active
-    @endif
-@stop
-
 @section('title'){{ Auth::user()->name; }}, Edit Your Task @stop
 
 @section('body')
@@ -31,7 +13,7 @@
             {{ Form::hidden('task_name','', array('id' => 'task_name')) }}
         
             {{ Form::label('complete', 'Complete?', array('class' => 'editlabel')) }}
-            {{ Form::checkbox('complete', 1, $task['complete'], array('onclick' => 'funcToggleDate()')) }}<br><br>
+            {{ Form::checkbox('complete', 1, $task['complete'], array('id'=>'checkedoff','onclick' => 'funcToggleDate()')) }}<br><br>
             
             <div id="datecomplete">
             {{ Form::label('completed_at', 'Date Complete:', array('class' => 'editlabel')) }}

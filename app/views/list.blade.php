@@ -1,30 +1,6 @@
 @extends('_master')
 
-@section('all')
-	@if ($status == 'all')
-    	active
-    @endif
-@stop
-
-@section('complete')
-	@if ($status == 'completed')
-    	active
-    @endif
-@stop
-
-@section('open')
-	@if ($status == 'open')
-    	active
-    @endif
-@stop
-
-@section('title')
-	Here Are Your
-	@if ($status != 'all')
-        {{ ucfirst($status) }}
-    @endif
-    Tasks
-@stop
+@section('title')Here Are Your @if ($status != 'all'){{ ucfirst($status) }}@endif Tasks @stop
 
 @section('body')
     @if(count($tasks) == 0)
@@ -42,7 +18,6 @@
         	The tasks in <span class="open">bold</span> are those that have not yet been completed. 
         @endif
         </p>
-        <p>
             <div class="table-responsive toppadding">
                 <table class="table table-striped">
                     <thead>
@@ -96,14 +71,11 @@
                     </tbody>
                 </table>
             </div>
-        </p>
     @endif
     
 
 @stop
 
 @section('footer')
-	<!--
-    -->
     <script type="text/javascript" src="{{ URL::asset('scripts/delete.js') }}"></script>
 @stop	

@@ -1,18 +1,7 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the Closure to execute when that URI is requested.
-|
-*/
-
 /*-------------------------------------------------------------------------
-Home page
+// ! Home page
 -------------------------------------------------------------------------*/
 Route::get('/', function()
 {
@@ -20,9 +9,8 @@ Route::get('/', function()
 });
 
 
-
 /*-------------------------------------------------------------------------
-// !get signup user
+// ! GET signup user - go to the signup form.
 -------------------------------------------------------------------------*/
 Route::get('/signup',
     array(
@@ -34,10 +22,11 @@ Route::get('/signup',
 );
 
 /*-------------------------------------------------------------------------
-// !post signup user
+// ! POST signup user - process the signup form.
 -------------------------------------------------------------------------*/
 Route::post('/signup', array('before' => 'csrf', function() {
 	
+	# Validate user signup info.
 	$rules = array(
 		'email' => 'required|email|unique:users,email',
 		'name' => 'required',
@@ -75,9 +64,8 @@ Route::post('/signup', array('before' => 'csrf', function() {
 }));
 
 
-
 /*-------------------------------------------------------------------------
-// !get login user
+// ! GET login user - go to login form.
 -------------------------------------------------------------------------*/
 Route::get('/login',
     array(
@@ -89,26 +77,26 @@ Route::get('/login',
 );
 
 /*-------------------------------------------------------------------------
-// !post login user
+// ! POST login user - process login form.
 -------------------------------------------------------------------------*/
 Route::post('/login', array('before' => 'csrf', function() {
 
 	$credentials = Input::only('email', 'password');
 
+	# Continue to intended page onced logged in.
 	if (Auth::attempt($credentials, $remember = true)) {
 		return Redirect::intended('list')->with('flash_message', 'Welcome Back!');
 	}
+	# Or go back to login page.
 	else {
 		return Redirect::to('/login')->with('flash_message', 'Log in failed; please try again.');
 	}
-
-	return Redirect::to('login');
 
 }));
 
 
 /*-------------------------------------------------------------------------
-// !get logout user
+// ! GET logout user - log out user and return to login page.
 -------------------------------------------------------------------------*/
 Route::get('/logout', function() {
 
@@ -122,12 +110,13 @@ Route::get('/logout', function() {
 
 
 /*-------------------------------------------------------------------------------------------------
-// !get list tasks
+// ! GET list tasks - present list pages for all, complete and open.
 -------------------------------------------------------------------------------------------------*/
 Route::get('/list/{status?}', array('before' => 'auth', function($status = 'all') {
 	
 	$userid = Auth::user()->id;
 	
+	# Collect the tasks related to the user.
 	if($status == 'completed') {
 		$tasks = Task::where('complete', '>', '0')
 				->where('user_id', '=', $userid)
@@ -148,10 +137,8 @@ Route::get('/list/{status?}', array('before' => 'auth', function($status = 'all'
 }));
 
 
-
-
 /*-------------------------------------------------------------------------------------------------
-// !get add tasks
+// ! GET add tasks - go to add tasks form.
 -------------------------------------------------------------------------------------------------*/
 Route::get('/add', array('before' => 'auth', function() {
 	
@@ -161,10 +148,11 @@ Route::get('/add', array('before' => 'auth', function() {
 }));
 
 /*-------------------------------------------------------------------------------------------------
-// !post add tasks
+// ! POST add tasks - process add tasks form.
 -------------------------------------------------------------------------------------------------*/
 Route::post('/add', array('before' => 'csrf', function() {
 	
+	#Validation of newly added tasks.
 	$rules = array(
 		'name' => 'required',
 		'task_name' => 'unique:tasks,task_name'
@@ -196,18 +184,19 @@ Route::post('/add', array('before' => 'csrf', function() {
 			->withInput();
 	}
 
+	# Go to list once the add task has completed.
 	return Redirect::to('/list')->with('flash_message', 'Task added successfully');
 
 
 }));
 
 
-
 /*-------------------------------------------------------------------------------------------------
-// !get edit tasks
+// ! GET edit task - go to edit task page.
 -------------------------------------------------------------------------------------------------*/
 Route::get('/edit/{item?}/{status?}', array('before' => 'auth', function($item=0, $status='all') {
 	
+	# make sure the task item exists
 	try {
 		$task = Task::findOrFail($item);
 	}
@@ -217,6 +206,7 @@ Route::get('/edit/{item?}/{status?}', array('before' => 'auth', function($item=0
 	
 	$userid = Auth::user()->id;
 	
+	# assign variable that populates the complete date value in form
 	if($task->completed_at != NULL) {
 		$complete_date = strtotime($task->completed_at);
 		$complete_date = date('m/d/Y',$complete_date);
@@ -234,10 +224,11 @@ Route::get('/edit/{item?}/{status?}', array('before' => 'auth', function($item=0
 }));
 
 /*-------------------------------------------------------------------------------------------------
-// !post edit tasks
+// ! POST edit task - process edit task page.
 -------------------------------------------------------------------------------------------------*/
 Route::post('/edit/{item}/{status}', array('before' => 'csrf', function($item, $status) {
 
+	# Validation of edited task.
 	$rules = array(
 		'name' => 'required',
 		'task_name' => 'unique:tasks,task_name',
@@ -258,12 +249,13 @@ Route::post('/edit/{item}/{status}', array('before' => 'csrf', function($item, $
 	$task->name = Input::get('name');
 	$task->complete = Input::get('complete');
 	
+	# Fills the placeholder field with a value
+	# This field is a unique task name for the user.
 	if(Input::get('task_name') != '') {
 		$task->task_name = Input::get('task_name');
 	}
-
-	// 2014-07-31 20:42:34
 	
+	# This populates the completion date field if the complete box is checked.
 	if($task->complete > 0) {
 		$complete_date = strtotime(Input::get('completed_at'));
 		$complete_date = date('Y-m-d h:i:s', $complete_date);
@@ -273,22 +265,22 @@ Route::post('/edit/{item}/{status}', array('before' => 'csrf', function($item, $
 	else {
 		$task->completed_at = NULL;
 	}
+	# 2014-07-31 20:42:34 - the format the timestamp fields are expecting.
 
 	$task->save();
 	
-
+	# Once edited, return to list.
 	return Redirect::to('/list/'.$status)->with('flash_message', 'Task updated successfully');
 
 }));
 
 
-
-
 /*-------------------------------------------------------------------------------------------------
-// !get delete tasks
+// ! GET delete task - delete the current task.
 -------------------------------------------------------------------------------------------------*/
 Route::get('/delete/{item?}/{status?}', array('before' => 'auth', function($item=0, $status='all') {
 	
+	# make sure the task item exists
 	try {
 		$task = Task::findOrFail($item);
 	}
@@ -296,73 +288,11 @@ Route::get('/delete/{item?}/{status?}', array('before' => 'auth', function($item
 		return Redirect::to('/list')->with('flash_message', 'Task not found');
 	}
 	
+	# Delete the task. The confirmation is done through javascript.
 	$task->delete();
 	
+	# Return to listonce deleted.
 	return Redirect::to('/list/'.$status)
 		->with('flash_message', 'Task deleted successfully');
 }));
 
-/*-------------------------------------------------------------------------
-// debugging routes
--------------------------------------------------------------------------*/
-
-// Find out what environment we're in.
-Route::get('/get-environment',function() {
-
-    echo "Environment: ".App::environment();
-
-});
-
-// Trigger an error to check whether detailed error or generic error is displayed.
-Route::get('/trigger-error',function() {
-
-    # Class Foobar should not exist, so this should create an error
-    $foo = new Foobar;
-
-});
-
-// Output debugging info about your app's environment and database connection.
-Route::get('/debug', function() {
-
-    echo '<pre>';
-
-    echo '<h1>environment.php</h1>';
-    $path   = base_path().'/environment.php';
-
-    try {
-        $contents = 'Contents: '.File::getRequire($path);
-        $exists = 'Yes';
-    }
-    catch (Exception $e) {
-        $exists = 'No. Defaulting to `production`';
-        $contents = '';
-    }
-
-    echo "Checking for: ".$path.'<br>';
-    echo 'Exists: '.$exists.'<br>';
-    echo $contents;
-    echo '<br>';
-
-    echo '<h1>Environment</h1>';
-    echo App::environment().'</h1>';
-
-    echo '<h1>Debugging?</h1>';
-    if(Config::get('app.debug')) echo "Yes"; else echo "No";
-
-    echo '<h1>Database Config</h1>';
-    print_r(Config::get('database.connections.mysql'));
-
-    echo '<h1>Test Database Connection</h1>';
-    try {
-        $results = DB::select('SHOW DATABASES;');
-        echo '<strong style="background-color:green; padding:5px;">Connection confirmed</strong>';
-        echo "<br><br>Your Databases:<br><br>";
-        print_r($results);
-    } 
-    catch (Exception $e) {
-        echo '<strong style="background-color:orange; padding:5px;">Caught exception: ', $e->getMessage(), "</strong>\n";
-    }
-
-    echo '</pre>';
-
-});

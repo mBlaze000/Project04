@@ -1,7 +1,5 @@
 @extends('_master')
 
-@section('all')active @stop
-
 @section('title')Add Your Task Here @stop
 
 @section('body')

@@ -35,11 +35,11 @@
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li class="@yield('home')"><a href="/">Home</a></li>
-                    <li class="@yield('all')"><a href="/list/all">All Tasks</a></li>
-                    <li class="@yield('complete')"><a href="/list/completed">Complete</a></li>
-                    <li class="@yield('open')"><a href="/list/open">Open</a></li>
-                    <li class="@yield('login')">
+                    <li id="home"><a href="/">Home</a></li>
+                    <li id="all"><a href="/list/all">All Tasks</a></li>
+                    <li id="completed"><a href="/list/completed">Complete</a></li>
+                    <li id="open"><a href="/list/open">Open</a></li>
+                    <li id="login">
                         @if(Auth::check())
                             <a href='/logout'>Logout {{ Auth::user()->name; }}</a>
                         @else 
@@ -79,6 +79,7 @@
       <!-- Additional JavaScript
     ================================================== -->
   @yield('footer')
+	<script type="text/javascript" src="{{ URL::asset('scripts/menu.js') }}"></script>
 
 </body>
 </html>
